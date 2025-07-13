@@ -1,0 +1,3811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafbfc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .date-navigation {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: #f3f4f6;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .date-display {
+            font-size: 18px;
+            font-weight: 500;
+            color: #374151;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 240px;
+            gap: 20px;
+        }
+
+        .calendar-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-height: 800px;
+            position: relative;
+        }
+
+        .return-to-week-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+            display: none;
+        }
+
+        .return-to-week-btn:hover {
+            background: white;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .employee-row {
+            display: grid;
+            background: #eff6ff;
+            border-bottom: 1px solid #bfdbfe;
+            box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .employee-cell {
+            padding: 12px 16px;
+            text-align: center;
+            border-left: 1px solid #e5e7eb;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .employee-cell:first-child {
+            border-left: none;
+        }
+
+        .calendar-header {
+            display: grid;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .day-header {
+            padding: 20px 16px;
+            text-align: center;
+            border-left: 1px solid #e5e7eb;
+        }
+
+        .day-header:first-child {
+            border-left: none;
+        }
+
+        .day-extra-text {
+            font-size: 11px;
+            color: #1f2937;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #eff6ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .day-name {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .day-number {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .calendar-body {
+            display: grid;
+            min-height: 750px;
+        }
+
+        .day-column {
+            border-left: 1px solid #e5e7eb;
+            border-bottom: 1px solid #f3f4f6;
+            position: relative;
+            padding: 12px;
+            min-height: 150px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .day-column:first-child {
+            border-left: none;
+        }
+
+        .day-column:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Single Day View */
+        .calendar-single-day {
+            grid-template-columns: 1fr !important;
+        }
+
+        .calendar-single-day .day-column:not(.single-day-view),
+        .calendar-single-day .day-header:not(.single-day-header),
+        .calendar-single-day .employee-cell:not(.single-day-employee) {
+            display: none !important;
+        }
+
+        .single-day-view {
+            grid-column: 1 / -1;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            background-color: #eff6ff;
+        }
+
+        .single-day-header {
+            grid-column: 1 / -1 !important;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+            color: white !important;
+            font-size: 18px !important;
+            padding: 24px !important;
+            text-align: center !important;
+            border-radius: 8px 8px 0 0 !important;
+        }
+
+        .single-day-employee {
+            grid-column: 1 / -1 !important;
+            text-align: center !important;
+            font-size: 14px !important;
+            padding: 16px !important;
+        }
+
+        /* Event Styles */
+        .event {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event.selected {
+            background: linear-gradient(135deg, #10b981, #047857);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+
+        .event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .event.selected:hover {
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .event-checkbox {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .event-checkbox.checked {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .event-checkbox.checked::after {
+            content: '✓';
+            color: #10b981;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: -1px;
+            left: 2px;
+        }
+
+        .event-title {
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+
+        .event-provider {
+            position: absolute;
+            top: 28px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .event-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .event-time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .event-location {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .event-languages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            margin-top: 4px;
+        }
+
+        .language-tag {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 1px 4px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .event-participants {
+            font-weight: 500;
+        }
+
+        /* Icons */
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* Date Input Styles */
+        .date-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .date-input-toggle {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        .date-input-toggle:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .date-feedback {
+            font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #6b7280;
+        }
+
+        .date-format-hint {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 2px;
+            font-style: italic;
+            display: none;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .validate-btn {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .validate-btn:hover:not(:disabled) {
+            background: #059669;
+        }
+
+        .validate-btn:disabled {
+            background: #9ca3af;
+            color: #6b7280;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Multi-Select Dropdown Styles */
+        .multi-select-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .multi-select-trigger {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 38px;
+            transition: border-color 0.2s;
+        }
+
+        .multi-select-trigger:hover {
+            border-color: #9ca3af;
+        }
+
+        .multi-select-trigger.open {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .multi-select-placeholder {
+            color: #6b7280;
+        }
+
+        .multi-select-selected {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .multi-select-tag {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .multi-select-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            color: #6b7280;
+        }
+
+        .multi-select-tag-remove:hover {
+            color: #dc2626;
+        }
+
+        .multi-select-arrow {
+            transition: transform 0.2s;
+        }
+
+        .multi-select-arrow.rotate {
+            transform: rotate(180deg);
+        }
+
+        .multi-select-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .multi-select-dropdown-menu.show {
+            display: block;
+        }
+
+        .multi-select-search {
+            padding: 8px 12px;
+            border: none;
+            border-bottom: 1px solid #e5e7eb;
+            width: 100%;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .multi-select-search:focus {
+            border-bottom-color: #3b82f6;
+        }
+
+        .multi-select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .multi-select-option:hover {
+            background: #f3f4f6;
+        }
+
+        .multi-select-option.selected {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .multi-select-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .multi-select-checkbox.checked {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .multi-select-checkbox.checked::after {
+            content: '✓';
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.2s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #374151;
+        }
+
+        .modal-content {
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .export-option:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .export-option.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .export-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .export-icon {
+            width: 24px;
+            height: 24px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .export-icon.excel { background: #e8f5e8; color: #047857; }
+        .export-icon.pdf { background: #fef2f2; color: #dc2626; }
+
+        .alert-content {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .alert-content strong {
+            color: #1f2937;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Order History Side Panel */
+        .order-history-panel {
+            position: fixed;
+            top: 0;
+            left: -700px;
+            width: 700px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: left 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .order-history-panel.show {
+            left: 0;
+        }
+
+        .order-history-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .order-history-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .order-history-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .order-history-close:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .order-history-filters {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .order-history-filters-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .order-history-filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .order-history-filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .order-history-filter-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .order-history-date-range {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .order-history-date-range input {
+            flex: 1;
+            font-size: 11px;
+            padding: 4px 6px;
+        }
+
+        .order-history-date-separator {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        /* Cascading Weeks Dropdown */
+        .weeks-cascading-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .weeks-dropdown-trigger {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 28px;
+            transition: border-color 0.2s;
+        }
+
+        .weeks-dropdown-trigger:hover {
+            border-color: #9ca3af;
+        }
+
+        .weeks-dropdown-trigger.open {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .weeks-dropdown-placeholder {
+            color: #6b7280;
+        }
+
+        .weeks-selected-display {
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .weeks-dropdown-arrow {
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+
+        .weeks-dropdown-arrow.rotate {
+            transform: rotate(180deg);
+        }
+
+        .weeks-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .weeks-dropdown-menu.show {
+            display: block;
+        }
+
+        .weeks-month-group {
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .weeks-month-header {
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            font-size: 11px;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .weeks-month-header:hover {
+            background: #f3f4f6;
+        }
+
+        .weeks-month-header.expanded {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .weeks-month-content {
+            display: none;
+            background: white;
+        }
+
+        .weeks-month-content.show {
+            display: block;
+        }
+
+        .weeks-week-option {
+            padding: 6px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            font-size: 11px;
+        }
+
+        .weeks-week-option:hover {
+            background: #f3f4f6;
+        }
+
+        .weeks-week-option.selected {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .weeks-week-checkbox {
+            width: 14px;
+            height: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .weeks-week-checkbox.checked {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .weeks-week-checkbox.checked::after {
+            content: '✓';
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .order-history-filter-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .order-history-filter-input,
+        .order-history-filter-select {
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+            color: #374151;
+            transition: border-color 0.2s;
+        }
+
+        .order-history-filter-input:focus,
+        .order-history-filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .order-history-filter-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .order-history-filter-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #d1d5db;
+        }
+
+        .order-history-filter-btn.primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .order-history-filter-btn.primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .order-history-filter-btn.secondary {
+            background: white;
+            color: #6b7280;
+        }
+
+        .order-history-filter-btn.secondary:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .order-history-navigation {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .order-history-nav-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+
+        .order-history-nav-btn:hover:not(:disabled) {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .order-history-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .order-history-info {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .order-history-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .order-history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-history-table th {
+            background: #f8fafc;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .order-history-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+            color: #1f2937;
+            vertical-align: top;
+        }
+
+        .order-history-table tr.history-row-clickable {
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+
+        .order-history-table tr.history-row-clickable:hover {
+            background: #f0f9ff !important;
+        }
+
+        .order-history-table tr.history-row-clickable:active {
+            background: #dbeafe !important;
+        }
+
+        .order-history-table tr.history-row-clickable::after {
+            content: '⏱';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .order-history-table tr.history-row-clickable:hover::after {
+            opacity: 0.6;
+        }
+
+        .order-history-table tr:not(.history-row-clickable):hover {
+            background: #f8fafc;
+        }
+
+        .order-history-year {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .order-history-week {
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .order-history-date {
+            font-weight: 500;
+            color: #059669;
+        }
+
+        .order-history-title-cell {
+            max-width: 200px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .order-history-validator {
+            font-weight: 600;
+            color: #7c3aed;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .order-history-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .order-history-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Status Timeline Tooltip */
+        .status-timeline-tooltip {
+            position: fixed;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            max-width: 500px;
+            width: 450px;
+            max-height: 800px;
+            overflow: hidden;
+            display: none;
+            pointer-events: auto;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .status-timeline-tooltip.show {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-timeline-tooltip.maximized {
+            width: 90vw;
+            height: 90vh;
+            max-width: none;
+            max-height: none;
+            top: 5vh !important;
+            left: 5vw !important;
+        }
+
+        .timeline-header {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .timeline-header.dragging {
+            cursor: grabbing;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .timeline-control-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .timeline-control-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .timeline-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+        
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 74px;
+            top: 70px;
+            bottom: -20px;
+            width: 2px;
+            background: #ddd;
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .timeline-icon-container {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-icon-allocated {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .timeline-icon-standby {
+            background-color: #9E9E9E;
+            color: white;
+        }
+        
+        .timeline-icon-cancelled {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-timestamp {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .timeline-status-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-status-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        
+        .timeline-language-info {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.4;
+        }
+        
+        .timeline-time-period {
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-time-period:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .timeline-icon-symbol {
+            font-size: 20px;
+        }
+
+        /* Timeline Backdrop */
+        .timeline-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            display: none;
+        }
+
+        .timeline-backdrop.show {
+            display: block;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .date-navigation {
+                justify-content: space-between;
+            }
+
+            .order-history-panel {
+                width: 100%;
+                left: -100%;
+            }
+
+            .order-history-filters-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .order-history-filter-group {
+                grid-column: 1 !important;
+            }
+
+            .order-history-filter-group.full-width {
+                grid-column: 1 !important;
+            }
+
+            .order-history-date-range {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .order-history-date-separator {
+                align-self: center;
+            }
+
+            .order-history-table th,
+            .order-history-table td {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .order-history-title-cell {
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="brand">Order Management</div>
+            
+            <div class="date-navigation">
+                <button class="nav-btn" onclick="navigateWeek(-1)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M15 18L9 12L15 6"/>
+                    </svg>
+                </button>
+                <div class="date-display">03/03/2025 - 09/03/2025</div>
+                <button class="nav-btn" onclick="navigateWeek(1)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M9 18L15 12L9 6"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="header-actions">
+                <div class="user-profile">
+                    <div class="user-avatar">HI</div>
+                    <span>Heydens Ian</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="calendar-section">
+                <button class="return-to-week-btn" id="returnToWeekBtn" onclick="returnToWeekView()">
+                    ← Return to Week View
+                </button>
+                
+                <div class="employee-row" id="employeeRow">
+                    <!-- Employee cells will be generated dynamically -->
+                </div>
+                
+                <div class="calendar-header" id="calendarHeader">
+                    <!-- Day headers will be generated dynamically -->
+                </div>
+                
+                <div class="calendar-body" id="calendarBody">
+                    <!-- Day columns will be generated dynamically -->
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="panel">
+                    <h3 class="panel-title">Filters</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <div class="date-input-container">
+                            <input type="date" class="form-input" value="2025-03-03" id="startDate" data-manual="false">
+                            <button type="button" class="date-input-toggle" onclick="toggleDateInputMode('startDate')" title="Switch to manual entry">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="m18.5 2.5 a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="date-feedback" id="startDateFeedback">
+                            📅 Click input to open calendar or use toggle for manual entry
+                        </div>
+                        <div class="date-format-hint" id="startDateHint">
+                            Format: DD/MM/YYYY (e.g., 15/03/2025)
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">End Date</label>
+                        <div class="date-input-container">
+                            <input type="date" class="form-input" value="2025-03-09" id="endDate" data-manual="false">
+                            <button type="button" class="date-input-toggle" onclick="toggleDateInputMode('endDate')" title="Switch to manual entry">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="m18.5 2.5 a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="date-feedback" id="endDateFeedback">
+                            💡 Calendar displays the exact date range selected above
+                        </div>
+                        <div class="date-format-hint" id="endDateHint">
+                            Format: DD/MM/YYYY (e.g., 21/03/2025)
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Regime</label>
+                        <select class="form-select" id="regimeSelect">
+                            <option value="all">List Everything</option>
+                            <option value="with-regime">List only sessions with a regime</option>
+                            <option value="without-regime">List only sessions without a regime</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Provider</label>
+                        <div class="multi-select-dropdown" id="providerSelect">
+                            <div class="multi-select-trigger">
+                                <div class="multi-select-selected" id="providerSelected">
+                                    <span class="multi-select-placeholder">Select providers...</span>
+                                </div>
+                                <svg class="multi-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="multi-select-dropdown-menu" id="providerDropdown">
+                                <input type="text" class="multi-select-search" placeholder="Search providers...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Language</label>
+                        <div class="multi-select-dropdown" id="languageSelect">
+                            <div class="multi-select-trigger">
+                                <div class="multi-select-selected" id="languageSelected">
+                                    <span class="multi-select-placeholder">Select languages...</span>
+                                </div>
+                                <svg class="multi-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="multi-select-dropdown-menu" id="languageDropdown">
+                                <input type="text" class="multi-select-search" placeholder="Search languages...">
+                                <!-- Language options will be generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="toggleFilters()" id="filterToggle">Enable Filters</button>
+
+                    <div class="form-group">
+                        <label class="form-label">Language of Provisional List</label>
+                        <select class="form-select" id="provisionalLanguageSelect">
+                            <option value="en">English</option>
+                            <option value="fr">French</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="showExportModal()">Export Provisional List</button>
+                </div>
+
+                <div class="panel">
+                    <h3 class="panel-title">Event Selection</h3>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" id="toggleButton" onclick="toggleAllSelection()">
+                            Select All
+                        </button>
+                        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="toggleOrderHistory()">
+                            Order History
+                        </button>
+                        <div style="font-size: 12px; color: #6b7280; text-align: center; margin-bottom: 8px;">
+                            Click events or use toggle above
+                        </div>
+                        <div style="font-size: 11px; color: #9ca3af; text-align: center; font-style: italic;">
+                            💡 Double-click any day to focus on that day only
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3 class="panel-title">Quick Actions</h3>
+                    <button class="validate-btn" onclick="showValidateModal()" id="validateBtn" disabled>Validate Orders (Select Events)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order History Side Panel -->
+    <div id="orderHistoryOverlay" class="order-history-overlay" onclick="closeOrderHistory()"></div>
+    <div id="orderHistoryPanel" class="order-history-panel">
+        <div class="order-history-header">
+            <h3 class="order-history-title">Order History</h3>
+            <button class="order-history-close" onclick="closeOrderHistory()">&times;</button>
+        </div>
+        
+        <div class="order-history-filters">
+            <div class="order-history-filters-title">Filters</div>
+            <div class="order-history-filters-grid">
+                <div class="order-history-filter-group">
+                    <label class="order-history-filter-label">Year</label>
+                    <select class="order-history-filter-select" id="historyYearFilter">
+                        <option value="">All Years</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+                <div class="order-history-filter-group">
+                    <label class="order-history-filter-label">Validator</label>
+                    <select class="order-history-filter-select" id="historyValidatorFilter">
+                        <option value="">All Validators</option>
+                        <option value="BLACKMUIR">BLACKMUIR</option>
+                        <option value="INGREY">INGREY</option>
+                        <option value="MAOULA">MAOULA</option>
+                        <option value="VOICISA">VOICISA</option>
+                    </select>
+                </div>
+                <div class="order-history-filter-group">
+                    <label class="order-history-filter-label">Weeks</label>
+                    <div class="weeks-cascading-dropdown" id="weeksSelect">
+                        <div class="weeks-dropdown-trigger">
+                            <div class="weeks-selected-display" id="weeksSelectedDisplay">
+                                <span class="weeks-dropdown-placeholder">Select weeks...</span>
+                            </div>
+                            <svg class="weeks-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="weeks-dropdown-menu" id="weeksDropdownMenu">
+                            <!-- Weeks will be generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <div class="order-history-filter-group full-width">
+                    <label class="order-history-filter-label">Date Range</label>
+                    <div class="order-history-date-range">
+                        <input type="date" class="order-history-filter-input" id="historyDateFromFilter" placeholder="From">
+                        <span class="order-history-date-separator">to</span>
+                        <input type="date" class="order-history-filter-input" id="historyDateToFilter" placeholder="To">
+                    </div>
+                </div>
+                <div class="order-history-filter-group full-width">
+                    <label class="order-history-filter-label">Segment Title</label>
+                    <input type="text" class="order-history-filter-input" id="historyTitleFilter" placeholder="Search segment titles...">
+                </div>
+            </div>
+            <div class="order-history-filter-actions">
+                <button class="order-history-filter-btn secondary" onclick="clearHistoryFilters()">Clear</button>
+                <button class="order-history-filter-btn primary" onclick="applyHistoryFilters()">Apply</button>
+            </div>
+        </div>
+        
+        <div class="order-history-navigation">
+            <button class="order-history-nav-btn" id="historyPrevBtn" onclick="navigateHistory(-1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18L9 12L15 6"/>
+                </svg>
+            </button>
+            <div class="order-history-info" id="historyInfo">
+                Showing all entries
+            </div>
+            <button class="order-history-nav-btn" id="historyNextBtn" onclick="navigateHistory(1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18L15 12L9 6"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="order-history-content">
+            <table class="order-history-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Wk</th>
+                        <th>Validation Date</th>
+                        <th>Segment Title</th>
+                        <th>Validated By</th>
+                    </tr>
+                </thead>
+                <tbody id="orderHistoryTableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Export Provisional List</h3>
+                <button class="modal-close" onclick="closeModal('exportModal')">&times;</button>
+            </div>
+            <div class="modal-content">
+                <p style="margin-bottom: 16px; color: #6b7280;">Select the format for exporting your provisional list:</p>
+                <div class="export-options">
+                    <label class="export-option" onclick="selectExportOption('excel')">
+                        <input type="radio" name="exportFormat" value="excel">
+                        <div class="export-icon excel">XLS</div>
+                        <div>
+                            <strong>Excel</strong>
+                            <div style="font-size: 13px; color: #6b7280;">Spreadsheet format (.xlsx)</div>
+                        </div>
+                    </label>
+                    <label class="export-option selected" onclick="selectExportOption('pdf')">
+                        <input type="radio" name="exportFormat" value="pdf" checked>
+                        <div class="export-icon pdf">PDF</div>
+                        <div>
+                            <strong>PDF</strong>
+                            <div style="font-size: 13px; color: #6b7280;">Portable document format (.pdf)</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('exportModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="exportData()">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validate Modal -->
+    <div id="validateModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Validate Orders</h3>
+                <button class="modal-close" onclick="closeModal('validateModal')">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="alert-content">
+                    <p><strong>Order Validation Notice</strong></p>
+                    <p>Confirm validation of selected segments. This action cannot be undone.</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal('validateModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="validateOrders()">Validate & Adjust</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        const multiSelectState = {
+            providerSelect: new Set(),
+            languageSelect: new Set()
+        };
+
+        const languageCodes = ["FR","DE","EN","IT","ES","NL","PT","EL","DA","FI","SV","CS","ET","LV","LT","HU","MT","PL","SK","SL","BG","RO","HR","AB","AF","AM","AR","AS","AZ","BA","BE","BH","BI","BN","BO","BR","BS","CEB","CH","CO","CR","CU","CV","DV","DZ","EE","FA","FF","FJ","FO","GN","GU","GV","HA","HAW","HE","HI","HMN","HT","HY","ID","IG","II","IK","IO","IS","IU","JA","JV","KA","KG","KI","KJ","KK","KL","KM","KN","KO","KR","KS","KU","KV","KY","LA","LG","LI","LN","LO","LU","MG","MH","MI","ML","MN","MO","MR","MS","MY","NA","NB","ND","NE","NG","NN","NO","NR","NV","NY","OC","OM","OR","OS","PA","PI","PS","QU","RN","RU","RW","SA","SC","SD","SE","SG","SH","SI","SM","SN","SO","SR","SS","ST","SU","SW","TA","TE","TG","TH","TI","TK","TL","TN","TO","TR","TS","TT","TW","TY","UG","UK","UR","UZ","VE","VI","VO","WA","WO","XH","YI","YO","ZA","ZH","ZU"];
+        const euLanguageCodes = ["FR","DE","EN","IT","ES","NL","PT","EL","DA","FI","SV","CS","ET","LV","LT","HU","MT","PL","SK","SL","BG","RO","HR"];
+
+        // Order History data and state
+        const orderHistoryData = [
+            { year: 2026, week: 14, validationDate: "06/05/2025", segmentTitle: "R. INTEGRATION, MIGRATION ET LOGEMENT (IMEX)", validatedBy: "BLACKMUIR" },
+            { year: 2026, week: 13, validationDate: "06/05/2025", segmentTitle: "GR. PROTECTION ET INFORMATION DES CONSOMMATEURS", validatedBy: "INGREY" },
+            { year: 2026, week: 33, validationDate: "05/05/2025", segmentTitle: "CONSEIL AFFAIRES GENERALES", validatedBy: "MAOULA" },
+            { year: 2025, week: 32, validationDate: "04/07/2025", segmentTitle: "R. HORIZONTAL DROGUE (GHD) (SUITE 2)", validatedBy: "VOICISA" },
+            { year: 2025, week: 31, validationDate: "31/06/2025", segmentTitle: "R. UNION DOUANIERE", validatedBy: "BLACKMUIR" },
+            { year: 2025, week: 30, validationDate: "29/06/2025", segmentTitle: "R. UNION DOUANIERE", validatedBy: "INGREY" },
+            { year: 2025, week: 31, validationDate: "28/06/2025", segmentTitle: "GR. QUESTIONS SOCIALES (GQS)", validatedBy: "MAOULA" },
+            { year: 2025, week: 30, validationDate: "28/06/2025", segmentTitle: "GR. QUESTIONS SOCIALES (GQS)", validatedBy: "VOICISA" },
+            { year: 2025, week: 29, validationDate: "27/06/2025", segmentTitle: "GR. ENVIRONNEMENT", validatedBy: "MAOULA" },
+            { year: 2025, week: 28, validationDate: "20/06/2025", segmentTitle: "GR. TRANSPORTS TERRESTRES", validatedBy: "VOICISA" },
+            { year: 2025, week: 20, validationDate: "20/06/2025", segmentTitle: "*(no title provided)*", validatedBy: "MAOULA" }
+        ];
+
+        let orderHistoryCurrentPage = 0;
+        const orderHistoryPageSize = 10;
+        let isOrderHistoryOpen = false;
+        let orderHistoryFilteredData = [...orderHistoryData];
+        let activeHistoryFilters = {
+            year: '',
+            validator: '',
+            title: '',
+            dateFrom: '',
+            dateTo: '',
+            weeks: new Set()
+        };
+
+        // Weeks data organized by months
+        const weeksData = [
+            { month: 'January', weeks: [1, 2, 3, 4, 5] },
+            { month: 'February', weeks: [6, 7, 8, 9] },
+            { month: 'March', weeks: [10, 11, 12, 13, 14] },
+            { month: 'April', weeks: [15, 16, 17, 18] },
+            { month: 'May', weeks: [19, 20, 21, 22] },
+            { month: 'June', weeks: [23, 24, 25, 26] },
+            { month: 'July', weeks: [27, 28, 29, 30, 31] },
+            { month: 'August', weeks: [32, 33, 34, 35] },
+            { month: 'September', weeks: [36, 37, 38, 39, 40] },
+            { month: 'October', weeks: [41, 42, 43, 44] },
+            { month: 'November', weeks: [45, 46, 47, 48] },
+            { month: 'December', weeks: [49, 50, 51, 52] }
+        ];
+
+        let selectedEvents = new Set();
+        let filtersEnabled = false;
+        let currentStartDate = new Date('2025-03-03');
+        let isSingleDayView = false;
+        let selectedDayIndex = null;
+
+        // Events data with the fix - this will be modified when events are validated
+        let eventsData = [
+            {
+                id: 1,
+                title: "PRESS BRIEFING AHEAD COUNCIL ECOFIN",
+                provider: "HOP",
+                time: "10:30 - 12:00",
+                location: "EB Presse",
+                participants: "2/2",
+                date: "2025-03-04",
+                hasRegime: true,
+                languages: ["EN", "FR"]
+            },
+            {
+                id: 2,
+                title: "WP TRADE QUESTIONS",
+                provider: "SCIC",
+                time: "10:00 - 11:30",
+                location: "Room EB-Executive Board",
+                participants: "7/5",
+                date: "2025-03-05",
+                hasRegime: false,
+                languages: ["EN", "FR", "DE", "ES", "IT"]
+            },
+            {
+                id: 3,
+                title: "COREPER 2 - PERMANENT REPRESENTATIVES COMMITTEE",
+                provider: "HOP",
+                time: "03:00 - 05:00",
+                location: "LEX 1",
+                participants: "3/3",
+                date: "2025-03-07",
+                hasRegime: true,
+                languages: ["EN", "FR", "DE"]
+            },
+            {
+                id: 4,
+                title: "WP ON THE UNITED KINGDOM",
+                provider: "SCIC",
+                time: "17:17 - 19:00",
+                location: "20.2",
+                participants: "5/5",
+                date: "2025-03-05",
+                hasRegime: false,
+                languages: ["EN", "FR", "DE", "IT", "ES"]
+            }
+        ];
+
+        // Date Input Functions
+        function toggleDateInputMode(inputId) {
+            const input = document.getElementById(inputId);
+            const feedback = document.getElementById(inputId + 'Feedback');
+            const hint = document.getElementById(inputId + 'Hint');
+            const toggle = input.parentElement.querySelector('.date-input-toggle');
+            const isManual = input.getAttribute('data-manual') === 'true';
+
+            if (isManual) {
+                switchToDatePickerMode(input, feedback, hint, toggle);
+            } else {
+                switchToManualEntryMode(input, feedback, hint, toggle);
+            }
+        }
+
+        function switchToDatePickerMode(input, feedback, hint, toggle) {
+            const currentValue = input.value;
+            input.type = 'date';
+            input.setAttribute('data-manual', 'false');
+            input.placeholder = '';
+            
+            if (input.type === 'date' && currentValue) {
+                const parsedDate = parseManualDate(currentValue);
+                if (parsedDate) {
+                    input.value = formatDateForInput(parsedDate);
+                }
+            }
+            
+            feedback.innerHTML = '📅 Click input to open calendar or use toggle for manual entry';
+            hint.style.display = 'none';
+            
+            toggle.title = 'Switch to manual entry';
+            toggle.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="m18.5 2.5 a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+                </svg>
+            `;
+            
+            updateCalendar();
+        }
+
+        function switchToManualEntryMode(input, feedback, hint, toggle) {
+            const currentValue = input.value;
+            input.type = 'text';
+            input.setAttribute('data-manual', 'true');
+            input.placeholder = 'DD/MM/YYYY';
+            
+            if (currentValue) {
+                const date = new Date(currentValue);
+                if (!isNaN(date.getTime())) {
+                    input.value = formatDateDDMMYYYY(date);
+                }
+            }
+            
+            feedback.innerHTML = '✏️ Type date manually (DD/MM/YYYY format)';
+            hint.style.display = 'block';
+            
+            toggle.title = 'Switch to calendar picker';
+            toggle.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+            `;
+            
+            input.focus();
+        }
+
+        function parseManualDate(dateString) {
+            const cleanString = dateString.replace(/[^\d]/g, '');
+            
+            if (cleanString.length !== 8) return null;
+            
+            const day = parseInt(cleanString.substring(0, 2), 10);
+            const month = parseInt(cleanString.substring(2, 4), 10);
+            const year = parseInt(cleanString.substring(4, 8), 10);
+            
+            if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1000) {
+                return null;
+            }
+            
+            const date = new Date(year, month - 1, day);
+            
+            if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
+                return null;
+            }
+            
+            return date;
+        }
+
+        function getCurrentDateValue(inputId) {
+            const input = document.getElementById(inputId);
+            
+            if (input.getAttribute('data-manual') === 'true') {
+                const parsedDate = parseManualDate(input.value);
+                return parsedDate ? formatDateForInput(parsedDate) : null;
+            } else {
+                return input.value;
+            }
+        }
+
+        // Multi-select dropdown functions
+        function initializeMultiSelectDropdowns() {
+            // Provider dropdown
+            const providerTrigger = document.querySelector('#providerSelect .multi-select-trigger');
+            if (providerTrigger) {
+                providerTrigger.addEventListener('click', function() {
+                    toggleMultiSelect('providerSelect');
+                });
+            }
+
+            // Language dropdown
+            const languageTrigger = document.querySelector('#languageSelect .multi-select-trigger');
+            if (languageTrigger) {
+                languageTrigger.addEventListener('click', function() {
+                    toggleMultiSelect('languageSelect');
+                });
+            }
+            
+            // Initialize language options with "All EU" at the top
+            const languageDropdown = document.getElementById('languageDropdown');
+            
+            // Add "All EU" option
+            const allEuOption = document.createElement('div');
+            allEuOption.className = 'multi-select-option';
+            allEuOption.innerHTML = `
+                <div class="multi-select-checkbox"></div>
+                <span style="font-weight: 600; color: #3b82f6;">All EU</span>
+            `;
+            allEuOption.addEventListener('click', function() {
+                toggleAllEUSelection(this);
+            });
+            languageDropdown.appendChild(allEuOption);
+            
+            // Add separator
+            const separator = document.createElement('div');
+            separator.style.borderTop = '1px solid #e5e7eb';
+            separator.style.margin = '4px 0';
+            languageDropdown.appendChild(separator);
+            
+            // Add individual language options
+            languageCodes.forEach(langCode => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'multi-select-option';
+                optionDiv.setAttribute('data-value', langCode);
+                optionDiv.innerHTML = `
+                    <div class="multi-select-checkbox"></div>
+                    <span>${langCode}</span>
+                `;
+                
+                optionDiv.addEventListener('click', function() {
+                    toggleMultiSelectOption('languageSelect', langCode, this);
+                });
+                
+                languageDropdown.appendChild(optionDiv);
+            });
+
+            // Provider options - add "All Providers" at the top
+            const providerDropdown = document.getElementById('providerDropdown');
+            
+            // Clear existing content
+            providerDropdown.innerHTML = `
+                <input type="text" class="multi-select-search" placeholder="Search providers...">
+            `;
+            
+            // Add "All Providers" option
+            const allProvidersOption = document.createElement('div');
+            allProvidersOption.className = 'multi-select-option';
+            allProvidersOption.innerHTML = `
+                <div class="multi-select-checkbox"></div>
+                <span style="font-weight: 600; color: #3b82f6;">All Providers</span>
+            `;
+            allProvidersOption.addEventListener('click', function() {
+                toggleAllProvidersSelection(this);
+            });
+            providerDropdown.appendChild(allProvidersOption);
+            
+            // Add separator
+            const providerSeparator = document.createElement('div');
+            providerSeparator.style.borderTop = '1px solid #e5e7eb';
+            providerSeparator.style.margin = '4px 0';
+            providerDropdown.appendChild(providerSeparator);
+            
+            // Add individual provider options
+            const providers = ['SCIC', 'HOP', 'ALTO'];
+            providers.forEach(provider => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'multi-select-option';
+                optionDiv.setAttribute('data-value', provider);
+                optionDiv.innerHTML = `
+                    <div class="multi-select-checkbox"></div>
+                    <span>${provider}</span>
+                `;
+                
+                optionDiv.addEventListener('click', function() {
+                    toggleMultiSelectOption('providerSelect', provider, this);
+                });
+                
+                providerDropdown.appendChild(optionDiv);
+            });
+
+            // Initialize search functionality
+            initializeMultiSelectSearch();
+        }
+
+        function initializeMultiSelectSearch() {
+            // Provider search
+            const providerSearch = document.querySelector('#providerDropdown .multi-select-search');
+            if (providerSearch) {
+                providerSearch.addEventListener('input', function(e) {
+                    filterMultiSelectOptions('providerDropdown', e.target.value);
+                });
+            }
+
+            // Language search
+            const languageSearch = document.querySelector('#languageDropdown .multi-select-search');
+            if (languageSearch) {
+                languageSearch.addEventListener('input', function(e) {
+                    filterMultiSelectOptions('languageDropdown', e.target.value);
+                });
+            }
+        }
+
+        function filterMultiSelectOptions(dropdownId, searchTerm) {
+            const dropdown = document.getElementById(dropdownId);
+            const options = dropdown.querySelectorAll('.multi-select-option[data-value]');
+            const searchLower = searchTerm.toLowerCase();
+
+            options.forEach(option => {
+                const text = option.querySelector('span').textContent.toLowerCase();
+                if (text.includes(searchLower)) {
+                    option.style.display = 'flex';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleMultiSelect(selectId) {
+            const dropdown = document.getElementById(selectId);
+            const menu = document.getElementById(selectId.replace('Select', 'Dropdown'));
+            
+            if (!dropdown || !menu) return;
+            
+            const trigger = dropdown.querySelector('.multi-select-trigger');
+            const arrow = trigger ? trigger.querySelector('.multi-select-arrow') : null;
+            
+            if (!trigger || !arrow) return;
+            
+            const isOpen = menu.classList.contains('show');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.multi-select-dropdown-menu').forEach(otherMenu => {
+                if (otherMenu !== menu) {
+                    otherMenu.classList.remove('show');
+                }
+            });
+            document.querySelectorAll('.multi-select-trigger').forEach(otherTrigger => {
+                if (otherTrigger !== trigger) {
+                    otherTrigger.classList.remove('open');
+                }
+            });
+            document.querySelectorAll('.multi-select-arrow').forEach(otherArrow => {
+                if (otherArrow !== arrow) {
+                    otherArrow.classList.remove('rotate');
+                }
+            });
+            
+            // Toggle current dropdown
+            if (!isOpen) {
+                menu.classList.add('show');
+                trigger.classList.add('open');
+                arrow.classList.add('rotate');
+                
+                const searchInput = menu.querySelector('.multi-select-search');
+                if (searchInput) {
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+            } else {
+                menu.classList.remove('show');
+                trigger.classList.remove('open');
+                arrow.classList.remove('rotate');
+            }
+        }
+
+        function toggleAllEUSelection(optionElement) {
+            const state = multiSelectState.languageSelect;
+            const checkbox = optionElement.querySelector('.multi-select-checkbox');
+            const languageDropdown = document.getElementById('languageDropdown');
+            
+            // Check if all EU languages are currently selected
+            const allEUSelected = euLanguageCodes.every(lang => state.has(lang));
+            
+            if (allEUSelected) {
+                // Deselect all EU languages
+                euLanguageCodes.forEach(lang => {
+                    state.delete(lang);
+                    // Update individual checkboxes
+                    const langOptions = languageDropdown.querySelectorAll('.multi-select-option');
+                    langOptions.forEach(option => {
+                        const span = option.querySelector('span');
+                        if (span && span.textContent === lang) {
+                            option.classList.remove('selected');
+                            option.querySelector('.multi-select-checkbox').classList.remove('checked');
+                        }
+                    });
+                });
+                checkbox.classList.remove('checked');
+                optionElement.classList.remove('selected');
+            } else {
+                // Select all EU languages
+                euLanguageCodes.forEach(lang => {
+                    state.add(lang);
+                    // Update individual checkboxes
+                    const langOptions = languageDropdown.querySelectorAll('.multi-select-option');
+                    langOptions.forEach(option => {
+                        const span = option.querySelector('span');
+                        if (span && span.textContent === lang) {
+                            option.classList.add('selected');
+                            option.querySelector('.multi-select-checkbox').classList.add('checked');
+                        }
+                    });
+                });
+                checkbox.classList.add('checked');
+                optionElement.classList.add('selected');
+            }
+            
+            updateMultiSelectDisplay('languageSelect');
+            
+            if (filtersEnabled) {
+                applyFilters();
+            }
+        }
+
+        function toggleAllProvidersSelection(optionElement) {
+            const state = multiSelectState.providerSelect;
+            const checkbox = optionElement.querySelector('.multi-select-checkbox');
+            const providerDropdown = document.getElementById('providerDropdown');
+            const providers = ['SCIC', 'HOP', 'ALTO'];
+            
+            // Check if all providers are currently selected
+            const allProvidersSelected = providers.every(provider => state.has(provider));
+            
+            if (allProvidersSelected) {
+                // Deselect all providers
+                providers.forEach(provider => {
+                    state.delete(provider);
+                    // Update individual checkboxes
+                    const providerOptions = providerDropdown.querySelectorAll('.multi-select-option');
+                    providerOptions.forEach(option => {
+                        const span = option.querySelector('span');
+                        if (span && span.textContent === provider) {
+                            option.classList.remove('selected');
+                            option.querySelector('.multi-select-checkbox').classList.remove('checked');
+                        }
+                    });
+                });
+                checkbox.classList.remove('checked');
+                optionElement.classList.remove('selected');
+            } else {
+                // Select all providers
+                providers.forEach(provider => {
+                    state.add(provider);
+                    // Update individual checkboxes
+                    const providerOptions = providerDropdown.querySelectorAll('.multi-select-option');
+                    providerOptions.forEach(option => {
+                        const span = option.querySelector('span');
+                        if (span && span.textContent === provider) {
+                            option.classList.add('selected');
+                            option.querySelector('.multi-select-checkbox').classList.add('checked');
+                        }
+                    });
+                });
+                checkbox.classList.add('checked');
+                optionElement.classList.add('selected');
+            }
+            
+            updateMultiSelectDisplay('providerSelect');
+            
+            if (filtersEnabled) {
+                applyFilters();
+            }
+        }
+
+        function toggleMultiSelectOption(selectId, value, optionElement) {
+            const state = multiSelectState[selectId];
+            const checkbox = optionElement.querySelector('.multi-select-checkbox');
+            
+            if (state.has(value)) {
+                state.delete(value);
+                checkbox.classList.remove('checked');
+                optionElement.classList.remove('selected');
+            } else {
+                state.add(value);
+                checkbox.classList.add('checked');
+                optionElement.classList.add('selected');
+            }
+            
+            // Update "All EU" checkbox state if this is a language selection
+            if (selectId === 'languageSelect') {
+                updateAllEUCheckboxState();
+            }
+            
+            // Update "All Providers" checkbox state if this is a provider selection
+            if (selectId === 'providerSelect') {
+                updateAllProvidersCheckboxState();
+            }
+            
+            updateMultiSelectDisplay(selectId);
+            
+            if (filtersEnabled) {
+                applyFilters();
+            }
+        }
+
+        function updateAllEUCheckboxState() {
+            const state = multiSelectState.languageSelect;
+            const languageDropdown = document.getElementById('languageDropdown');
+            const allEUOption = languageDropdown.querySelector('.multi-select-option');
+            
+            if (allEUOption) {
+                const allEUCheckbox = allEUOption.querySelector('.multi-select-checkbox');
+                const allEUSelected = euLanguageCodes.every(lang => state.has(lang));
+                
+                if (allEUSelected) {
+                    allEUCheckbox.classList.add('checked');
+                    allEUOption.classList.add('selected');
+                } else {
+                    allEUCheckbox.classList.remove('checked');
+                    allEUOption.classList.remove('selected');
+                }
+            }
+        }
+
+        function updateAllProvidersCheckboxState() {
+            const state = multiSelectState.providerSelect;
+            const providerDropdown = document.getElementById('providerDropdown');
+            const allProvidersOption = providerDropdown.querySelector('.multi-select-option');
+            const providers = ['SCIC', 'HOP', 'ALTO'];
+            
+            if (allProvidersOption) {
+                const allProvidersCheckbox = allProvidersOption.querySelector('.multi-select-checkbox');
+                const allProvidersSelected = providers.every(provider => state.has(provider));
+                
+                if (allProvidersSelected) {
+                    allProvidersCheckbox.classList.add('checked');
+                    allProvidersOption.classList.add('selected');
+                } else {
+                    allProvidersCheckbox.classList.remove('checked');
+                    allProvidersOption.classList.remove('selected');
+                }
+            }
+        }
+
+        function updateMultiSelectDisplay(selectId) {
+            const selectedContainer = document.getElementById(selectId.replace('Select', 'Selected'));
+            const state = multiSelectState[selectId];
+            
+            if (!selectedContainer) return;
+            
+            selectedContainer.innerHTML = '';
+            
+            if (state.size === 0) {
+                const placeholderText = selectId === 'providerSelect' ? 'Select providers...' : 'Select languages...';
+                selectedContainer.innerHTML = `<span class="multi-select-placeholder">${placeholderText}</span>`;
+            } else {
+                Array.from(state).forEach(value => {
+                    const tag = document.createElement('div');
+                    tag.className = 'multi-select-tag';
+                    tag.innerHTML = `
+                        <span>${value}</span>
+                        <span class="multi-select-tag-remove" onclick="removeMultiSelectTag('${selectId}', '${value}')">&times;</span>
+                    `;
+                    selectedContainer.appendChild(tag);
+                });
+            }
+        }
+
+        function removeMultiSelectTag(selectId, value) {
+            event.stopPropagation();
+            const state = multiSelectState[selectId];
+            state.delete(value);
+            
+            const dropdown = document.getElementById(selectId.replace('Select', 'Dropdown'));
+            const options = dropdown.querySelectorAll('.multi-select-option');
+            options.forEach(option => {
+                const span = option.querySelector('span');
+                if (span && span.textContent === value) {
+                    option.classList.remove('selected');
+                    option.querySelector('.multi-select-checkbox').classList.remove('checked');
+                }
+            });
+            
+            updateMultiSelectDisplay(selectId);
+            
+            if (filtersEnabled) {
+                applyFilters();
+            }
+        }
+
+        // Navigation functions
+        function navigateWeek(direction) {
+            if (isSingleDayView) {
+                returnToWeekView();
+            }
+            
+            const startDateValue = getCurrentDateValue('startDate');
+            const endDateValue = getCurrentDateValue('endDate');
+            
+            if (!startDateValue || !endDateValue) {
+                alert('Please enter valid start and end dates');
+                return;
+            }
+            
+            const startDate = new Date(startDateValue);
+            const endDate = new Date(endDateValue);
+            const currentRange = getDaysBetweenDates(startDate, endDate);
+            
+            const newStartDate = new Date(startDate);
+            newStartDate.setDate(newStartDate.getDate() + (direction * currentRange));
+            
+            const newEndDate = new Date(newStartDate);
+            newEndDate.setDate(newEndDate.getDate() + currentRange - 1);
+            
+            currentStartDate = newStartDate;
+            
+            updateDateInput('startDate', newStartDate);
+            updateDateInput('endDate', newEndDate);
+            
+            updateCalendar();
+        }
+
+        function updateDateInput(inputId, date) {
+            const input = document.getElementById(inputId);
+            
+            if (input.getAttribute('data-manual') === 'true') {
+                input.value = formatDateDDMMYYYY(date);
+            } else {
+                input.value = formatDateForInput(date);
+            }
+        }
+
+        // Filter functions
+        function toggleFilters() {
+            const filterToggle = document.getElementById('filterToggle');
+            
+            if (filtersEnabled) {
+                filtersEnabled = false;
+                filterToggle.textContent = 'Enable Filters';
+                filterToggle.classList.remove('btn-success');
+                filterToggle.classList.add('btn-primary');
+                
+                document.getElementById('regimeSelect').value = 'all';
+                
+                multiSelectState.providerSelect.clear();
+                multiSelectState.languageSelect.clear();
+                updateMultiSelectDisplay('providerSelect');
+                updateMultiSelectDisplay('languageSelect');
+                
+                document.querySelectorAll('.multi-select-option').forEach(option => {
+                    option.classList.remove('selected');
+                    const checkbox = option.querySelector('.multi-select-checkbox');
+                    if (checkbox) {
+                        checkbox.classList.remove('checked');
+                    }
+                });
+                
+                showAllEvents();
+            } else {
+                filtersEnabled = true;
+                filterToggle.textContent = 'Disable Filters';
+                filterToggle.classList.remove('btn-primary');
+                filterToggle.classList.add('btn-success');
+                
+                applyFilters();
+            }
+        }
+
+        function applyFilters() {
+            updateCalendar();
+        }
+
+        function shouldShowEvent(event) {
+            if (!filtersEnabled) {
+                return true;
+            }
+            
+            const regimeFilter = document.getElementById('regimeSelect').value;
+            if (regimeFilter !== 'all') {
+                if (regimeFilter === 'with-regime' && !event.hasRegime) {
+                    return false;
+                }
+                if (regimeFilter === 'without-regime' && event.hasRegime) {
+                    return false;
+                }
+            }
+            
+            const selectedProviders = multiSelectState.providerSelect;
+            if (selectedProviders.size > 0) {
+                if (!selectedProviders.has(event.provider)) {
+                    return false;
+                }
+            }
+            
+            const selectedLanguages = multiSelectState.languageSelect;
+            if (selectedLanguages.size > 0) {
+                const hasMatchingLanguage = event.languages && event.languages.some(lang => 
+                    selectedLanguages.has(lang)
+                );
+                if (!hasMatchingLanguage) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function showAllEvents() {
+            updateCalendar();
+        }
+
+        // Event selection functions
+        function selectEvent(eventId) {
+            const eventElement = document.querySelector(`[data-event="${eventId}"]`);
+            const checkbox = document.getElementById(`checkbox-${eventId}`);
+            
+            if (!eventElement || !checkbox) return;
+            
+            if (selectedEvents.has(eventId)) {
+                selectedEvents.delete(eventId);
+                eventElement.classList.remove('selected');
+                checkbox.classList.remove('checked');
+            } else {
+                selectedEvents.add(eventId);
+                eventElement.classList.add('selected');
+                checkbox.classList.add('checked');
+            }
+            
+            updateToggleButton();
+            updateValidateButton();
+        }
+
+        function toggleAllSelection() {
+            const allVisibleEvents = Array.from(document.querySelectorAll('.event')).map(el => parseInt(el.getAttribute('data-event')));
+            
+            if (allVisibleEvents.length === 0) return;
+            
+            const allSelected = allVisibleEvents.length > 0 && allVisibleEvents.every(id => selectedEvents.has(id));
+            
+            if (allSelected) {
+                allVisibleEvents.forEach(eventId => {
+                    selectedEvents.delete(eventId);
+                    const eventElement = document.querySelector(`[data-event="${eventId}"]`);
+                    const checkbox = document.getElementById(`checkbox-${eventId}`);
+                    if (eventElement && checkbox) {
+                        eventElement.classList.remove('selected');
+                        checkbox.classList.remove('checked');
+                    }
+                });
+            } else {
+                allVisibleEvents.forEach(eventId => {
+                    selectedEvents.add(eventId);
+                    const eventElement = document.querySelector(`[data-event="${eventId}"]`);
+                    const checkbox = document.getElementById(`checkbox-${eventId}`);
+                    if (eventElement && checkbox) {
+                        eventElement.classList.add('selected');
+                        checkbox.classList.add('checked');
+                    }
+                });
+            }
+            
+            updateToggleButton();
+            updateValidateButton();
+        }
+
+        function updateToggleButton() {
+            const toggleButton = document.getElementById('toggleButton');
+            if (!toggleButton) return;
+            
+            const allVisibleEvents = Array.from(document.querySelectorAll('.event')).map(el => parseInt(el.getAttribute('data-event')));
+            
+            if (allVisibleEvents.length === 0) {
+                toggleButton.textContent = 'No Events';
+                toggleButton.disabled = true;
+            } else {
+                toggleButton.disabled = false;
+                const allSelected = allVisibleEvents.length > 0 && allVisibleEvents.every(id => selectedEvents.has(id));
+                
+                if (allSelected) {
+                    toggleButton.textContent = 'Unselect All';
+                } else {
+                    toggleButton.textContent = 'Select All';
+                }
+            }
+        }
+
+        function updateValidateButton() {
+            const validateButton = document.getElementById('validateBtn');
+            if (!validateButton) return;
+            
+            if (selectedEvents.size === 0) {
+                validateButton.disabled = true;
+                validateButton.textContent = 'Validate Orders (Select Events)';
+            } else {
+                validateButton.disabled = false;
+                validateButton.textContent = `Validate Orders (${selectedEvents.size} selected)`;
+            }
+        }
+
+        // Single day view functions
+        function showSingleDayView(dayIndex) {
+            const dayColumns = document.querySelectorAll('.day-column');
+            const dayHeaders = document.querySelectorAll('.day-header');
+            const employeeCells = document.querySelectorAll('.employee-cell');
+            
+            if (dayIndex < 1 || dayIndex > dayColumns.length) return;
+            
+            isSingleDayView = true;
+            selectedDayIndex = dayIndex;
+            
+            const calendarHeader = document.getElementById('calendarHeader');
+            const calendarBody = document.getElementById('calendarBody');
+            const employeeRow = document.getElementById('employeeRow');
+            const returnBtn = document.getElementById('returnToWeekBtn');
+            
+            calendarHeader.classList.add('calendar-single-day');
+            calendarBody.classList.add('calendar-single-day');
+            employeeRow.classList.add('calendar-single-day');
+            
+            returnBtn.style.display = 'block';
+            
+            const dayHeader = dayHeaders[dayIndex - 1];
+            const dayColumn = dayColumns[dayIndex - 1];
+            const employeeCell = employeeCells[dayIndex - 1];
+            
+            if (dayHeader) dayHeader.classList.add('single-day-header');
+            if (dayColumn) dayColumn.classList.add('single-day-view');
+            if (employeeCell) employeeCell.classList.add('single-day-employee');
+        }
+
+        function returnToWeekView() {
+            isSingleDayView = false;
+            selectedDayIndex = null;
+            
+            const calendarHeader = document.getElementById('calendarHeader');
+            const calendarBody = document.getElementById('calendarBody');
+            const employeeRow = document.getElementById('employeeRow');
+            const returnBtn = document.getElementById('returnToWeekBtn');
+            
+            calendarHeader.classList.remove('calendar-single-day');
+            calendarBody.classList.remove('calendar-single-day');
+            employeeRow.classList.remove('calendar-single-day');
+            
+            returnBtn.style.display = 'none';
+            
+            document.querySelectorAll('.single-day-header').forEach(el => el.classList.remove('single-day-header'));
+            document.querySelectorAll('.single-day-view').forEach(el => el.classList.remove('single-day-view'));
+            document.querySelectorAll('.single-day-employee').forEach(el => el.classList.remove('single-day-employee'));
+        }
+
+        function addDayDoubleClickListeners() {
+            const dayColumns = document.querySelectorAll('.day-column');
+            
+            dayColumns.forEach((dayColumn, index) => {
+                dayColumn.addEventListener('dblclick', function(event) {
+                    event.preventDefault();
+                    
+                    if (isSingleDayView) {
+                        returnToWeekView();
+                    } else {
+                        showSingleDayView(index + 1);
+                    }
+                });
+            });
+        }
+
+        // Modal functions
+        function showExportModal() {
+            document.getElementById('exportModal').classList.add('show');
+        }
+
+        function showValidateModal() {
+            if (selectedEvents.size === 0) {
+                alert('⚠️ Please select at least one event before validating orders.');
+                return;
+            }
+            document.getElementById('validateModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function selectExportOption(format) {
+            document.querySelectorAll('.export-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            event.currentTarget.classList.add('selected');
+            document.querySelector(`input[value="${format}"]`).checked = true;
+        }
+
+        function exportData() {
+            const selectedFormat = document.querySelector('input[name="exportFormat"]:checked').value;
+            alert(`Exporting as ${selectedFormat.toUpperCase()}...`);
+            closeModal('exportModal');
+        }
+
+        // FIXED: This function now properly removes validated events
+        function validateOrders() {
+            const validatedCount = selectedEvents.size;
+            
+            // Remove validated events from the events data array
+            eventsData = eventsData.filter(event => !selectedEvents.has(event.id));
+            
+            // Clear the selected events set
+            selectedEvents.clear();
+            
+            // Update the calendar to reflect the changes
+            updateCalendar();
+            
+            // Update button states
+            updateToggleButton();
+            updateValidateButton();
+            
+            alert(`Successfully validated ${validatedCount} orders. Events have been removed from the calendar.`);
+            closeModal('validateModal');
+        }
+
+        // Order History Functions
+        function toggleOrderHistory() {
+            if (isOrderHistoryOpen) {
+                closeOrderHistory();
+            } else {
+                openOrderHistory();
+            }
+        }
+
+        function openOrderHistory() {
+            isOrderHistoryOpen = true;
+            document.getElementById('orderHistoryPanel').classList.add('show');
+            document.getElementById('orderHistoryOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            
+            // Reset filters and data
+            orderHistoryFilteredData = [...orderHistoryData];
+            orderHistoryCurrentPage = 0;
+            
+            populateOrderHistoryTable();
+            
+            // Add event listeners for filter inputs
+            initializeHistoryFilterEventListeners();
+            initializeWeeksCascadingDropdown();
+        }
+
+        function initializeWeeksCascadingDropdown() {
+            const weeksDropdownMenu = document.getElementById('weeksDropdownMenu');
+            const weeksTrigger = document.querySelector('#weeksSelect .weeks-dropdown-trigger');
+            
+            // Clear existing content
+            weeksDropdownMenu.innerHTML = '';
+            
+            // Generate months and weeks
+            weeksData.forEach((monthData, monthIndex) => {
+                const monthGroup = document.createElement('div');
+                monthGroup.className = 'weeks-month-group';
+                
+                const monthHeader = document.createElement('div');
+                monthHeader.className = 'weeks-month-header';
+                monthHeader.textContent = monthData.month;
+                monthHeader.setAttribute('data-month', monthIndex);
+                
+                const monthContent = document.createElement('div');
+                monthContent.className = 'weeks-month-content';
+                monthContent.setAttribute('data-month', monthIndex);
+                
+                // Add weeks for this month
+                monthData.weeks.forEach(weekNum => {
+                    const weekOption = document.createElement('div');
+                    weekOption.className = 'weeks-week-option';
+                    weekOption.setAttribute('data-week', weekNum);
+                    
+                    weekOption.innerHTML = `
+                        <div class="weeks-week-checkbox"></div>
+                        <span>Week ${String(weekNum).padStart(2, '0')}</span>
+                    `;
+                    
+                    weekOption.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        toggleWeekSelection(weekNum, this);
+                    });
+                    
+                    monthContent.appendChild(weekOption);
+                });
+                
+                // Add click handler for month header
+                monthHeader.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleMonthExpansion(monthIndex);
+                });
+                
+                monthGroup.appendChild(monthHeader);
+                monthGroup.appendChild(monthContent);
+                weeksDropdownMenu.appendChild(monthGroup);
+            });
+            
+            // Remove any existing event listeners to prevent duplicates
+            if (weeksTrigger) {
+                // Clone the element to remove all event listeners
+                const newTrigger = weeksTrigger.cloneNode(true);
+                weeksTrigger.parentNode.replaceChild(newTrigger, weeksTrigger);
+                
+                // Add fresh click handler for weeks trigger
+                newTrigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleWeeksDropdown();
+                });
+            }
+        }
+
+        function toggleWeeksDropdown() {
+            const menu = document.getElementById('weeksDropdownMenu');
+            const trigger = document.querySelector('#weeksSelect .weeks-dropdown-trigger');
+            const arrow = trigger ? trigger.querySelector('.weeks-dropdown-arrow') : null;
+            
+            if (!menu || !trigger || !arrow) {
+                console.log('Weeks dropdown elements not found:', { menu: !!menu, trigger: !!trigger, arrow: !!arrow });
+                return;
+            }
+            
+            const isOpen = menu.classList.contains('show');
+            
+            // Close other dropdowns first
+            document.querySelectorAll('.multi-select-dropdown-menu').forEach(otherMenu => {
+                otherMenu.classList.remove('show');
+            });
+            document.querySelectorAll('.multi-select-trigger').forEach(otherTrigger => {
+                otherTrigger.classList.remove('open');
+            });
+            
+            if (!isOpen) {
+                menu.classList.add('show');
+                trigger.classList.add('open');
+                arrow.classList.add('rotate');
+                console.log('Weeks dropdown opened');
+            } else {
+                menu.classList.remove('show');
+                trigger.classList.remove('open');
+                arrow.classList.remove('rotate');
+                console.log('Weeks dropdown closed');
+            }
+        }
+
+        function toggleMonthExpansion(monthIndex) {
+            const monthHeader = document.querySelector(`[data-month="${monthIndex}"].weeks-month-header`);
+            const monthContent = document.querySelector(`[data-month="${monthIndex}"].weeks-month-content`);
+            
+            const isExpanded = monthContent.classList.contains('show');
+            
+            if (!isExpanded) {
+                monthContent.classList.add('show');
+                monthHeader.classList.add('expanded');
+            } else {
+                monthContent.classList.remove('show');
+                monthHeader.classList.remove('expanded');
+            }
+        }
+
+        function toggleWeekSelection(weekNum, weekElement) {
+            const checkbox = weekElement.querySelector('.weeks-week-checkbox');
+            const isSelected = activeHistoryFilters.weeks.has(weekNum);
+            
+            if (isSelected) {
+                activeHistoryFilters.weeks.delete(weekNum);
+                checkbox.classList.remove('checked');
+                weekElement.classList.remove('selected');
+            } else {
+                activeHistoryFilters.weeks.add(weekNum);
+                checkbox.classList.add('checked');
+                weekElement.classList.add('selected');
+            }
+            
+            updateWeeksDisplay();
+        }
+
+        function updateWeeksDisplay() {
+            const display = document.getElementById('weeksSelectedDisplay');
+            const selectedWeeks = Array.from(activeHistoryFilters.weeks).sort((a, b) => a - b);
+            
+            if (selectedWeeks.length === 0) {
+                display.innerHTML = '<span class="weeks-dropdown-placeholder">Select weeks...</span>';
+            } else if (selectedWeeks.length <= 3) {
+                const weekLabels = selectedWeeks.map(week => `Week ${String(week).padStart(2, '0')}`);
+                display.innerHTML = `<span class="weeks-selected-display">${weekLabels.join(', ')}</span>`;
+            } else {
+                display.innerHTML = `<span class="weeks-selected-display">${selectedWeeks.length} weeks selected</span>`;
+            }
+        }
+
+        function initializeHistoryFilterEventListeners() {
+            const titleFilter = document.getElementById('historyTitleFilter');
+            if (titleFilter) {
+                titleFilter.addEventListener('input', debounce(applyHistoryFilters, 300));
+            }
+
+            const yearFilter = document.getElementById('historyYearFilter');
+            if (yearFilter) {
+                yearFilter.addEventListener('change', applyHistoryFilters);
+            }
+
+            const validatorFilter = document.getElementById('historyValidatorFilter');
+            if (validatorFilter) {
+                validatorFilter.addEventListener('change', applyHistoryFilters);
+            }
+
+            const dateFromFilter = document.getElementById('historyDateFromFilter');
+            if (dateFromFilter) {
+                dateFromFilter.addEventListener('change', applyHistoryFilters);
+            }
+
+            const dateToFilter = document.getElementById('historyDateToFilter');
+            if (dateToFilter) {
+                dateToFilter.addEventListener('change', applyHistoryFilters);
+            }
+        }
+
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function closeOrderHistory() {
+            isOrderHistoryOpen = false;
+            document.getElementById('orderHistoryPanel').classList.remove('show');
+            document.getElementById('orderHistoryOverlay').classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore background scrolling
+            
+            // Clear any filter event listeners to prevent memory leaks
+            clearHistoryFilterEventListeners();
+        }
+
+        function clearHistoryFilterEventListeners() {
+            const titleFilter = document.getElementById('historyTitleFilter');
+            if (titleFilter) {
+                titleFilter.removeEventListener('input', applyHistoryFilters);
+            }
+
+            const yearFilter = document.getElementById('historyYearFilter');
+            if (yearFilter) {
+                yearFilter.removeEventListener('change', applyHistoryFilters);
+            }
+
+            const validatorFilter = document.getElementById('historyValidatorFilter');
+            if (validatorFilter) {
+                validatorFilter.removeEventListener('change', applyHistoryFilters);
+            }
+
+            const dateFromFilter = document.getElementById('historyDateFromFilter');
+            if (dateFromFilter) {
+                dateFromFilter.removeEventListener('change', applyHistoryFilters);
+            }
+
+            const dateToFilter = document.getElementById('historyDateToFilter');
+            if (dateToFilter) {
+                dateToFilter.removeEventListener('change', applyHistoryFilters);
+            }
+        }
+
+        function populateOrderHistoryTable() {
+            const tableBody = document.getElementById('orderHistoryTableBody');
+            const startIndex = orderHistoryCurrentPage * orderHistoryPageSize;
+            const endIndex = Math.min(startIndex + orderHistoryPageSize, orderHistoryFilteredData.length);
+            const currentPageData = orderHistoryFilteredData.slice(startIndex, endIndex);
+
+            tableBody.innerHTML = '';
+
+            if (currentPageData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="5" style="text-align: center; padding: 20px; color: #6b7280; font-style: italic;">
+                        No records found matching the current filters
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            } else {
+                currentPageData.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Add clickable class and attributes to all rows
+                    row.classList.add('history-row-clickable');
+                    row.setAttribute('data-has-timeline', 'true');
+                    row.style.cursor = 'pointer';
+                    row.title = 'Click to view status timeline';
+                    
+                    row.innerHTML = `
+                        <td class="order-history-year">${entry.year}</td>
+                        <td class="order-history-week">${entry.week}</td>
+                        <td class="order-history-date">${entry.validationDate}</td>
+                        <td class="order-history-title-cell">${entry.segmentTitle}</td>
+                        <td class="order-history-validator">${entry.validatedBy}</td>
+                    `;
+                    
+                    // Add click event listener to each row
+                    row.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        showStatusTimelineTooltip(e);
+                    });
+                    
+                    // Add hover effects for visual feedback
+                    row.addEventListener('mouseenter', function() {
+                        row.style.backgroundColor = '#f0f9ff';
+                    });
+                    
+                    row.addEventListener('mouseleave', function() {
+                        row.style.backgroundColor = '';
+                    });
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+
+            updateOrderHistoryNavigation();
+            initializeStatusTimelineTooltip();
+        }
+
+        // Status Timeline Tooltip Functions
+        let timelineState = {
+            isDragging: false,
+            isMaximized: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            tooltipStartX: 0,
+            tooltipStartY: 0
+        };
+
+        function initializeStatusTimelineTooltip() {
+            // Create tooltip if it doesn't exist
+            if (!document.getElementById('statusTimelineTooltip')) {
+                createStatusTimelineTooltip();
+                createTimelineBackdrop();
+            }
+
+            // The event listeners are now added directly in populateOrderHistoryTable()
+            // This function just ensures the tooltip components exist
+        }
+
+        function createTimelineBackdrop() {
+            const backdrop = document.createElement('div');
+            backdrop.id = 'timelineBackdrop';
+            backdrop.className = 'timeline-backdrop';
+            backdrop.addEventListener('click', hideStatusTimelineTooltip);
+            document.body.appendChild(backdrop);
+        }
+
+        function createStatusTimelineTooltip() {
+            const tooltip = document.createElement('div');
+            tooltip.id = 'statusTimelineTooltip';
+            tooltip.className = 'status-timeline-tooltip';
+            tooltip.innerHTML = `
+                <div class="timeline-header" id="timelineHeader">
+                    <h3 class="timeline-title">Status Timeline</h3>
+                    <div class="timeline-controls">
+                        <button class="timeline-control-btn" id="maximizeBtn" title="Maximize">
+                            ⛶
+                        </button>
+                        <button class="timeline-control-btn" id="closeTimelineBtn" title="Close">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+                <div class="timeline-body">
+                    <div class="timeline-item">
+                        <div class="timeline-icon-container timeline-icon-allocated">
+                            <div class="timeline-icon-symbol">✓</div>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-timestamp">08 MAY 2025 AT 14:09:38</div>
+                            <div class="timeline-status-title">Allocated</div>
+                            <div class="timeline-status-description">Initial allocation</div>
+                            <div class="timeline-language-info">
+                                <div class="timeline-time-period">
+                                    AM<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE • IT • ES • PT • MT • PL<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE • IT • ES • PT • MT • PL
+                                </div>
+                                <div class="timeline-time-period">
+                                    PM<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE • IT • ES • PT • MT • PL<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE • IT • ES • PT • MT • PL
+                                </div>
+                                <div class="timeline-time-period">
+                                    EV<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE • IT • ES • PT • MT • PL<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE • IT • ES • PT • MT • PL
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon-container timeline-icon-standby">
+                            <div class="timeline-icon-symbol">↻</div>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-timestamp">19 JUNE 2025 AT 11:58:15</div>
+                            <div class="timeline-status-title">StandBy</div>
+                            <div class="timeline-status-description">Allocation moved to standby</div>
+                            <div class="timeline-language-info">
+                                <div class="timeline-time-period">
+                                    AM<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE
+                                </div>
+                                <div class="timeline-time-period">
+                                    PM<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE
+                                </div>
+                                <div class="timeline-time-period">
+                                    EV<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon-container timeline-icon-cancelled">
+                            <div class="timeline-icon-symbol">✕</div>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-timestamp">26 JUNE 2025 AT 18:46:41</div>
+                            <div class="timeline-status-title">Cancelled</div>
+                            <div class="timeline-status-description">Standby moved to cancelled</div>
+                            <div class="timeline-language-info">
+                                <div class="timeline-time-period">
+                                    AM<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE
+                                </div>
+                                <div class="timeline-time-period">
+                                    PM<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE
+                                </div>
+                                <div class="timeline-time-period">
+                                    EV<br>
+                                    <strong>P-LANG:</strong> EN • FR • DE<br>
+                                    <strong>A-LANG:</strong> EN • FR • DE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(tooltip);
+            
+            // Initialize drag and control functionality
+            initializeTimelineDragging();
+            initializeTimelineControls();
+        }
+
+        function initializeTimelineDragging() {
+            const header = document.getElementById('timelineHeader');
+            const tooltip = document.getElementById('statusTimelineTooltip');
+
+            header.addEventListener('mousedown', function(e) {
+                if (e.target.closest('.timeline-control-btn')) return;
+                
+                timelineState.isDragging = true;
+                timelineState.dragStartX = e.clientX;
+                timelineState.dragStartY = e.clientY;
+                
+                const rect = tooltip.getBoundingClientRect();
+                timelineState.tooltipStartX = rect.left;
+                timelineState.tooltipStartY = rect.top;
+                
+                header.classList.add('dragging');
+                document.addEventListener('mousemove', handleTimelineDrag);
+                document.addEventListener('mouseup', handleTimelineDragEnd);
+                e.preventDefault();
+            });
+        }
+
+        function handleTimelineDrag(e) {
+            if (!timelineState.isDragging || timelineState.isMaximized) return;
+
+            const deltaX = e.clientX - timelineState.dragStartX;
+            const deltaY = e.clientY - timelineState.dragStartY;
+            
+            let newX = timelineState.tooltipStartX + deltaX;
+            let newY = timelineState.tooltipStartY + deltaY;
+            
+            // Keep timeline within viewport bounds
+            const tooltip = document.getElementById('statusTimelineTooltip');
+            const rect = tooltip.getBoundingClientRect();
+            const maxX = window.innerWidth - rect.width;
+            const maxY = window.innerHeight - rect.height;
+            
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+            
+            tooltip.style.left = `${newX}px`;
+            tooltip.style.top = `${newY}px`;
+        }
+
+        function handleTimelineDragEnd() {
+            timelineState.isDragging = false;
+            document.getElementById('timelineHeader').classList.remove('dragging');
+            document.removeEventListener('mousemove', handleTimelineDrag);
+            document.removeEventListener('mouseup', handleTimelineDragEnd);
+        }
+
+        function initializeTimelineControls() {
+            const maximizeBtn = document.getElementById('maximizeBtn');
+            const closeBtn = document.getElementById('closeTimelineBtn');
+
+            maximizeBtn.addEventListener('click', toggleTimelineMaximize);
+            closeBtn.addEventListener('click', hideStatusTimelineTooltip);
+        }
+
+        function toggleTimelineMaximize() {
+            const tooltip = document.getElementById('statusTimelineTooltip');
+            const maximizeBtn = document.getElementById('maximizeBtn');
+            
+            timelineState.isMaximized = !timelineState.isMaximized;
+            
+            if (timelineState.isMaximized) {
+                tooltip.classList.add('maximized');
+                maximizeBtn.innerHTML = '⛷';
+                maximizeBtn.title = 'Restore';
+            } else {
+                tooltip.classList.remove('maximized');
+                maximizeBtn.innerHTML = '⛶';
+                maximizeBtn.title = 'Maximize';
+                // Re-position the timeline to be visible
+                positionTimelineInViewport();
+            }
+        }
+
+        function showStatusTimelineTooltip(event) {
+            const tooltip = document.getElementById('statusTimelineTooltip');
+            const backdrop = document.getElementById('timelineBackdrop');
+            
+            if (tooltip && backdrop) {
+                backdrop.classList.add('show');
+                tooltip.classList.add('show');
+                
+                if (!timelineState.isMaximized) {
+                    positionTimelineInViewport(event);
+                }
+                
+                // Prevent timeline from closing when clicked
+                tooltip.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        }
+
+        function hideStatusTimelineTooltip() {
+            const tooltip = document.getElementById('statusTimelineTooltip');
+            const backdrop = document.getElementById('timelineBackdrop');
+            
+            if (tooltip && backdrop) {
+                tooltip.classList.remove('show');
+                backdrop.classList.remove('show');
+                
+                // Reset maximize state
+                if (timelineState.isMaximized) {
+                    tooltip.classList.remove('maximized');
+                    timelineState.isMaximized = false;
+                    document.getElementById('maximizeBtn').innerHTML = '⛶';
+                    document.getElementById('maximizeBtn').title = 'Maximize';
+                }
+            }
+        }
+
+        function positionTimelineInViewport(event) {
+            const tooltip = document.getElementById('statusTimelineTooltip');
+            if (!tooltip) return;
+
+            const rect = tooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            let left, top;
+            
+            if (event) {
+                // Initial positioning near mouse
+                left = event.clientX + 15;
+                top = event.clientY + 15;
+            } else {
+                // Center positioning when no event
+                left = (viewportWidth - rect.width) / 2;
+                top = (viewportHeight - rect.height) / 2;
+            }
+
+            // Ensure tooltip stays within viewport bounds
+            const margin = 20;
+            left = Math.max(margin, Math.min(left, viewportWidth - rect.width - margin));
+            top = Math.max(margin, Math.min(top, viewportHeight - rect.height - margin));
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+        }
+
+        function updateOrderHistoryNavigation() {
+            const totalPages = Math.ceil(orderHistoryFilteredData.length / orderHistoryPageSize);
+            const currentPage = orderHistoryCurrentPage + 1;
+            const startEntry = orderHistoryFilteredData.length > 0 ? (orderHistoryCurrentPage * orderHistoryPageSize) + 1 : 0;
+            const endEntry = Math.min((orderHistoryCurrentPage + 1) * orderHistoryPageSize, orderHistoryFilteredData.length);
+
+            document.getElementById('historyInfo').textContent = 
+                `${startEntry}-${endEntry} of ${orderHistoryFilteredData.length}`;
+
+            document.getElementById('historyPrevBtn').disabled = orderHistoryCurrentPage === 0;
+            document.getElementById('historyNextBtn').disabled = orderHistoryCurrentPage >= totalPages - 1;
+        }
+
+        function navigateHistory(direction) {
+            const totalPages = Math.ceil(orderHistoryFilteredData.length / orderHistoryPageSize);
+            const newPage = orderHistoryCurrentPage + direction;
+
+            if (newPage >= 0 && newPage < totalPages) {
+                orderHistoryCurrentPage = newPage;
+                populateOrderHistoryTable();
+            }
+        }
+
+        // Order History Filter Functions
+        function applyHistoryFilters() {
+            // Get filter values
+            activeHistoryFilters.year = document.getElementById('historyYearFilter').value;
+            activeHistoryFilters.validator = document.getElementById('historyValidatorFilter').value;
+            activeHistoryFilters.title = document.getElementById('historyTitleFilter').value.toLowerCase();
+            activeHistoryFilters.dateFrom = document.getElementById('historyDateFromFilter').value;
+            activeHistoryFilters.dateTo = document.getElementById('historyDateToFilter').value;
+
+            // Apply filters to data
+            orderHistoryFilteredData = orderHistoryData.filter(entry => {
+                // Year filter
+                if (activeHistoryFilters.year && entry.year.toString() !== activeHistoryFilters.year) {
+                    return false;
+                }
+
+                // Validator filter
+                if (activeHistoryFilters.validator && entry.validatedBy !== activeHistoryFilters.validator) {
+                    return false;
+                }
+
+                // Title filter (case-insensitive partial match)
+                if (activeHistoryFilters.title && !entry.segmentTitle.toLowerCase().includes(activeHistoryFilters.title)) {
+                    return false;
+                }
+
+                // Week filter
+                if (activeHistoryFilters.weeks.size > 0) {
+                    if (!activeHistoryFilters.weeks.has(entry.week)) {
+                        return false;
+                    }
+                }
+
+                // Date range filter
+                if (activeHistoryFilters.dateFrom || activeHistoryFilters.dateTo) {
+                    const entryDate = parseHistoryDate(entry.validationDate);
+                    
+                    if (activeHistoryFilters.dateFrom) {
+                        const fromDate = new Date(activeHistoryFilters.dateFrom);
+                        if (entryDate < fromDate) {
+                            return false;
+                        }
+                    }
+                    
+                    if (activeHistoryFilters.dateTo) {
+                        const toDate = new Date(activeHistoryFilters.dateTo);
+                        if (entryDate > toDate) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            });
+
+            // Reset to first page
+            orderHistoryCurrentPage = 0;
+            
+            // Update display
+            populateOrderHistoryTable();
+        }
+
+        function parseHistoryDate(dateString) {
+            // Parse DD/MM/YYYY format
+            const parts = dateString.split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                const year = parseInt(parts[2], 10);
+                return new Date(year, month, day);
+            }
+            return new Date();
+        }
+
+        function clearHistoryFilters() {
+            // Clear filter inputs
+            document.getElementById('historyYearFilter').value = '';
+            document.getElementById('historyValidatorFilter').value = '';
+            document.getElementById('historyTitleFilter').value = '';
+            document.getElementById('historyDateFromFilter').value = '';
+            document.getElementById('historyDateToFilter').value = '';
+
+            // Clear weeks selection
+            activeHistoryFilters.weeks.clear();
+            
+            // Reset weeks display
+            updateWeeksDisplay();
+            
+            // Clear visual state of weeks
+            document.querySelectorAll('.weeks-week-option').forEach(option => {
+                option.classList.remove('selected');
+                const checkbox = option.querySelector('.weeks-week-checkbox');
+                if (checkbox) {
+                    checkbox.classList.remove('checked');
+                }
+            });
+
+            // Clear active filters
+            activeHistoryFilters = {
+                year: '',
+                validator: '',
+                title: '',
+                dateFrom: '',
+                dateTo: '',
+                weeks: new Set()
+            };
+
+            // Reset filtered data to all data
+            orderHistoryFilteredData = [...orderHistoryData];
+            orderHistoryCurrentPage = 0;
+
+            // Update display
+            populateOrderHistoryTable();
+        }
+
+        // Utility functions
+        function formatDateDDMMYYYY(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function formatDateForInput(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatEventDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        function getDaysBetweenDates(startDate, endDate) {
+            const timeDifference = endDate.getTime() - startDate.getTime();
+            const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24)) + 1;
+            return Math.max(1, dayDifference);
+        }
+
+        function createDynamicCalendarStructure(numDays) {
+            const calendarHeader = document.getElementById('calendarHeader');
+            const calendarBody = document.getElementById('calendarBody');
+            const employeeRow = document.getElementById('employeeRow');
+            
+            const gridColumns = `repeat(${numDays}, 1fr)`;
+            calendarHeader.style.gridTemplateColumns = gridColumns;
+            calendarBody.style.gridTemplateColumns = gridColumns;
+            employeeRow.style.gridTemplateColumns = gridColumns;
+            
+            calendarHeader.innerHTML = '';
+            calendarBody.innerHTML = '';
+            employeeRow.innerHTML = '';
+            
+            for (let i = 1; i <= numDays; i++) {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.id = `day${i}`;
+                calendarHeader.appendChild(dayHeader);
+                
+                const dayColumn = document.createElement('div');
+                dayColumn.className = 'day-column';
+                calendarBody.appendChild(dayColumn);
+                
+                const employeeCell = document.createElement('div');
+                employeeCell.className = 'employee-cell';
+                employeeRow.appendChild(employeeCell);
+            }
+        }
+
+        function updateCalendar() {
+            const startDateValue = getCurrentDateValue('startDate');
+            const endDateValue = getCurrentDateValue('endDate');
+            
+            if (!startDateValue || !endDateValue) return;
+            
+            const startDate = new Date(startDateValue);
+            const endDate = new Date(endDateValue);
+            
+            if (endDate < startDate) {
+                if (document.getElementById('endDate').getAttribute('data-manual') === 'true') {
+                    updateDateInput('endDate', startDate);
+                } else {
+                    document.getElementById('endDate').value = formatDateForInput(startDate);
+                }
+                return;
+            }
+            
+            currentStartDate = new Date(startDate);
+            
+            const dateDisplay = document.querySelector('.date-display');
+            const startStr = formatDateDDMMYYYY(startDate);
+            const endStr = formatDateDDMMYYYY(endDate);
+            dateDisplay.textContent = `${startStr} - ${endStr}`;
+            
+            const numDays = getDaysBetweenDates(startDate, endDate);
+            
+            createDynamicCalendarStructure(numDays);
+            
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const dayExtraText = {
+                'Mon': 'PAURI',
+                'Tue': 'VOICISA', 
+                'Wed': 'KOUSTAS',
+                'Thu': 'TALLOWIN',
+                'Fri': 'PAURI'
+            };
+            const currentDate = new Date(startDate);
+            
+            for (let i = 1; i <= numDays; i++) {
+                const dayHeader = document.getElementById(`day${i}`);
+                const dayName = dayNames[currentDate.getDay()];
+                const dayNumber = String(currentDate.getDate()).padStart(2, '0');
+                const extraText = dayExtraText[dayName] || '';
+                
+                dayHeader.innerHTML = `
+                    ${extraText ? `<div class="day-extra-text">${extraText}</div>` : ''}
+                    <div class="day-name">${dayName}</div>
+                    <div class="day-number">${dayNumber}</div>
+                `;
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            addEventsToCalendar(startDate, endDate);
+            
+            setTimeout(() => {
+                updateToggleButton();
+                updateValidateButton();
+                addDayDoubleClickListeners();
+            }, 100);
+        }
+
+        function addEventsToCalendar(startDate, endDate) {
+            const dayColumns = document.querySelectorAll('.day-column');
+            
+            dayColumns.forEach(column => {
+                column.innerHTML = '';
+            });
+            
+            // Use the dynamic eventsData array that gets modified when events are validated
+            eventsData.forEach(event => {
+                const eventDate = new Date(event.date);
+                
+                if (eventDate >= startDate && eventDate <= endDate) {
+                    if (!shouldShowEvent(event)) return;
+                    
+                    const daysDiff = Math.floor((eventDate - startDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysDiff >= 0 && daysDiff < dayColumns.length) {
+                        const targetColumn = dayColumns[daysDiff];
+                        
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'event';
+                        eventElement.setAttribute('data-event', event.id);
+                        
+                        if (selectedEvents.has(event.id)) {
+                            eventElement.classList.add('selected');
+                        }
+                        
+                        eventElement.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            selectEvent(event.id);
+                        });
+                        
+                        const languageTags = event.languages.map(lang => 
+                            `<span class="language-tag">${lang}</span>`
+                        ).join('');
+                        
+                        const eventDateFormatted = formatEventDate(eventDate);
+                        
+                        eventElement.innerHTML = `
+                            <div class="event-checkbox ${selectedEvents.has(event.id) ? 'checked' : ''}" id="checkbox-${event.id}"></div>
+                            <div class="event-provider">${event.provider}</div>
+                            <div class="event-title">${event.title}</div>
+                            <div style="font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin-bottom: 6px;">
+                                📅 ${eventDateFormatted}
+                            </div>
+                            <div class="event-meta">
+                                <div class="event-time">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12,6 12,12 16,14"/>
+                                    </svg>
+                                    ${event.time}
+                                </div>
+                                <div class="event-participants">${event.participants}</div>
+                            </div>
+                            <div class="event-location">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M21 10C21 17L12 23L3 10C3 6 7 2 12 2S21 6 21 10Z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                ${event.location}
+                            </div>
+                            <div class="event-languages">
+                                ${languageTags}
+                            </div>
+                        `;
+                        
+                        targetColumn.appendChild(eventElement);
+                    }
+                }
+            });
+            
+            setTimeout(() => {
+                updateToggleButton();
+                updateValidateButton();
+            }, 50);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMultiSelectDropdowns();
+            
+            // Add event listeners for date inputs
+            document.getElementById('startDate').addEventListener('change', updateCalendar);
+            document.getElementById('endDate').addEventListener('change', updateCalendar);
+            
+            // Add event listener for regime select
+            document.getElementById('regimeSelect').addEventListener('change', function() {
+                if (filtersEnabled) {
+                    applyFilters();
+                }
+            });
+            
+            updateCalendar();
+            
+            setTimeout(() => {
+                updateToggleButton();
+                updateValidateButton();
+            }, 100);
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            // Handle multi-select dropdowns
+            if (!event.target.closest('.multi-select-dropdown')) {
+                document.querySelectorAll('.multi-select-dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+                document.querySelectorAll('.multi-select-trigger').forEach(trigger => {
+                    trigger.classList.remove('open');
+                });
+                document.querySelectorAll('.multi-select-arrow').forEach(arrow => {
+                    arrow.classList.remove('rotate');
+                });
+            }
+            
+            // Handle weeks dropdown - only close if clicking outside the entire weeks dropdown
+            if (!event.target.closest('.weeks-cascading-dropdown')) {
+                const weeksMenu = document.getElementById('weeksDropdownMenu');
+                const weeksTrigger = document.querySelector('#weeksSelect .weeks-dropdown-trigger');
+                const weeksArrow = weeksTrigger ? weeksTrigger.querySelector('.weeks-dropdown-arrow') : null;
+                
+                if (weeksMenu && weeksTrigger && weeksArrow) {
+                    weeksMenu.classList.remove('show');
+                    weeksTrigger.classList.remove('open');
+                    weeksArrow.classList.remove('rotate');
+                }
+            }
+        });
+
+        // Close order history panel with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                if (isOrderHistoryOpen) {
+                    closeOrderHistory();
+                }
+                
+                // Also close timeline if open
+                const tooltip = document.getElementById('statusTimelineTooltip');
+                if (tooltip && tooltip.classList.contains('show')) {
+                    hideStatusTimelineTooltip();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
